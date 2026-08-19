@@ -3,41 +3,146 @@
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <link
       rel="shortcut icon"
       href="https://cdn.jsdelivr.net/gh/fromann/CDN@main/img/logo.ico"
     />
-    <title>小🌰&#10084;&#65039;</title>
+    <title>小🌰（秋儿）&#10084;&#65039;</title>
     <script src="https://cdn.jsdelivr.net/gh/zyoushuo/Blog/hexo/js/mouse_slide.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/zyoushuo/Blog/hexo/js/clicklove.js"></script>
     <style type="text/css">
       html,
       body {
         height: 100%;
+        height: 100dvh;
         padding: 0;
         margin: 0;
-        background: url("./image/bg.jpg") no-repeat;
-        background-size: contain;
+        background: url("./image/bg.jpg") no-repeat center center / cover;
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-evenly;
+        padding: 6vh 0;
       }
       canvas {
-        position: absolute;
+        position: fixed;
+        inset: 0;
         width: 100%;
         height: 100%;
       }
       .namebox {
         color: #fff;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        -webkit-transform: translate(-50%, -50%);
-        -moz-transform: translate(-50%, -50%);
-        -ms-transform: translate(-50%, -50%);
-        -o-transform: translate(-50%, -50%);
-        transform: translate(-50%, -50%);
+        position: relative;
+        text-align: center;
+        z-index: 5;
       }
       .namebox h1 {
         margin: 0 auto;
+        text-shadow: 0 0 20px rgba(255,48,197,.7), 0 0 45px rgba(255,48,197,.35);
+        font-size: clamp(26px, 8vw, 40px);
+        white-space: nowrap;
+      }
+      /* 七夕氛围遮罩 */
+      body::before {
+        content: '';
+        position: fixed; inset: 0;
+        background: radial-gradient(ellipse at top, rgba(40,10,70,.45), transparent 70%), radial-gradient(ellipse at bottom, rgba(70,10,40,.35), transparent 70%);
+        z-index: 1; pointer-events: none;
+      }
+      .qixi-text {
+        position: relative;
+        color: rgba(255,220,240,.95);
+        font-size: clamp(13px, 3.8vw, 16px);
+        letter-spacing: 2px;
+        text-align: center;
+        z-index: 5;
+        text-shadow: 0 0 10px rgba(255,100,180,.5);
+        line-height: 1.9;
+        max-width: 90vw;
+        pointer-events: none;
+      }
+      /* 回忆相册（三图轮播） */
+      .album {
+        position: relative;
+        width: clamp(120px, 40vw, 160px);
+        aspect-ratio: 150 / 198;
+        z-index: 5;
+        cursor: pointer;
+      }
+      .album-slide {
+        position: absolute;
+        inset: 0;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,.45), 0 0 0 3px rgba(255,150,200,.35);
+        opacity: 0;
+        transform: scale(.82) translateY(12px) rotate(-7deg);
+        transition: all .7s cubic-bezier(.4,0,.2,1);
+        z-index: 1;
+        background: rgba(255,150,200,.15);
+      }
+      .album-slide img {
+        width: 100%; height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .album-slide.active {
+        opacity: 1;
+        transform: scale(1) translateY(0) rotate(0);
+        z-index: 3;
+      }
+      .album-slide.prev {
+        opacity: .45;
+        transform: scale(.86) translateY(-8px) rotate(7deg);
+        z-index: 2;
+      }
+      .album-dots {
+        position: absolute;
+        bottom: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 8px;
+        z-index: 6;
+      }
+      .album-dots span {
+        width: 8px; height: 8px;
+        border-radius: 50%;
+        background: rgba(255,255,255,.35);
+        transition: all .4s;
+        cursor: pointer;
+      }
+      .album-dots span.on {
+        background: rgba(255,150,200,.95);
+        box-shadow: 0 0 8px rgba(255,48,197,.6);
+        transform: scale(1.25);
+      }
+      .next-btn {
+        position: relative;
+        padding: 13px 40px;
+        border: 1px solid rgba(255,150,200,.5);
+        border-radius: 30px;
+        background: rgba(255,48,197,.15);
+        color: #fff;
+        font-size: 14px;
+        letter-spacing: 2px;
+        text-decoration: none;
+        z-index: 5;
+        backdrop-filter: blur(5px);
+        transition: all .35s ease;
+        cursor: pointer;
+      }
+      .next-btn:active {
+        background: rgba(255,48,197,.4);
+        transform: scale(.95);
+      }
+      .next-btn:hover {
+        background: rgba(255,48,197,.35);
+        box-shadow: 0 0 24px rgba(255,48,197,.45);
+        transform: translateY(-2px);
       }
     </style>
   </head>
@@ -307,5 +412,43 @@
     <div class="namebox">
       <h1>lcl&#10084;&#65039;zl</h1>
     </div>
+    <div class="qixi-text">
+      七月初七 · 星河为证<br>
+      我把心动，藏进每一颗星星里
+    </div>
+    <div class="album" id="album">
+      <div class="album-slide active"><img src="./image/photo1.jpg" alt="我们的回忆 1"></div>
+      <div class="album-slide"><img src="./image/photo2.jpg" alt="我们的回忆 2"></div>
+      <div class="album-slide"><img src="./image/photo3.jpg" alt="我们的回忆 3"></div>
+      <div class="album-dots" id="albumDots"></div>
+    </div>
+    <a href="../love_tree/index.html" class="next-btn">💕 去看看我们的树 →</a>
+    <script>
+      (function(){
+        var slides = Array.prototype.slice.call(document.querySelectorAll('.album-slide'));
+        var dotsWrap = document.getElementById('albumDots');
+        var album = document.getElementById('album');
+        if(!slides.length || !album) return;
+        var cur = 0;
+        slides.forEach(function(s,i){
+          var d = document.createElement('span');
+          if(i===0) d.className = 'on';
+          (function(idx){ d.addEventListener('click', function(e){ e.stopPropagation(); go(idx); }); })(i);
+          dotsWrap.appendChild(d);
+        });
+        var dots = Array.prototype.slice.call(dotsWrap.children);
+        function go(n){
+          cur = (n + slides.length) % slides.length;
+          slides.forEach(function(s,i){
+            s.classList.remove('active','prev');
+            if(i === cur) s.classList.add('active');
+            else if(i === (cur - 1 + slides.length) % slides.length) s.classList.add('prev');
+          });
+          dots.forEach(function(d,i){ d.className = i === cur ? 'on' : ''; });
+        }
+        var timer = setInterval(function(){ go(cur + 1); }, 3500);
+        album.addEventListener('click', function(){ go(cur + 1); });
+      })();
+    </script>
   </body>
 </html>

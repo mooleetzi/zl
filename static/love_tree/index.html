@@ -1,213 +1,342 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "htt`://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>小🌰</title>     
-    <link type="text/css" rel="stylesheet" href="./css/default.css">
-    <script type="text/javascript" src="./css/jquery.min.js"></script>
-    <script type="text/javascript" src="./css/jscex.min.js"></script>
-    <script type="text/javascript" src="./css/jscex-parser.js"></script>
-    <script type="text/javascript" src="./css/jscex-jit.js"></script>
-    <script type="text/javascript" src="./css/jscex-builderbase.min.js"></script>
-    <script type="text/javascript" src="./css/jscex-async.min.js"></script>
-    <script type="text/javascript" src="./css/jscex-async-powerpack.min.js"></script>
-    <script type="text/javascript" src="./css/functions.js" charset="utf-8"></script>
-    <script type="text/javascript" src="./css/love.js" charset="utf-8"></script>
-      <style type="text/css">
-<!--
-.STYLE1 {color: #666666}
--->
-        </style>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>七夕 · 小🌰（秋儿）</title>
+<script src="./css/jquery.min.js"></script>
+<script src="./css/jscex.min.js"></script>
+<script src="./css/jscex-parser.js"></script>
+<script src="./css/jscex-jit.js"></script>
+<script src="./css/jscex-builderbase.min.js"></script>
+<script src="./css/jscex-async.min.js"></script>
+<script src="./css/jscex-async-powerpack.min.js"></script>
+<script src="./css/love.js" charset="utf-8"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    width: 100%; height: 100%; height: 100dvh;
+    overflow: hidden;
+    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: #160d2e;
+    color: #fff;
+  }
+
+  /* ===== 开始遮罩 ===== */
+  #start-overlay {
+    position: fixed; inset: 0; z-index: 999;
+    background: radial-gradient(ellipse at 50% 30%, #2a1445, #0d0718 75%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; transition: opacity .9s ease;
+  }
+  #start-overlay .qixi { font-size: 40px; font-weight: 700; letter-spacing: 10px; text-shadow: 0 0 35px rgba(255,150,200,.55); }
+  #start-overlay .hint { margin-top: 16px; font-size: 15px; letter-spacing: 3px; color: rgba(255,220,240,.85); }
+  #start-overlay .names { margin-top: 14px; font-size: 13px; letter-spacing: 2px; color: rgba(255,255,255,.5); }
+  #start-btn {
+    margin-top: 52px; width: 76px; height: 76px;
+    border: 2px solid rgba(255,150,200,.55); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; animation: pulse 2.2s infinite; transition: transform .3s;
+  }
+  #start-btn:active { transform: scale(.9); }
+  #start-btn svg { width: 28px; height: 28px; margin-left: 5px; }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255,150,200,.45); }
+    70% { box-shadow: 0 0 0 28px rgba(255,150,200,0); }
+    100% { box-shadow: 0 0 0 0 rgba(255,150,200,0); }
+  }
+  #start-overlay .tip { position: absolute; bottom: 6%; font-size: 12px; letter-spacing: 2px; color: rgba(255,255,255,.35); }
+
+  /* ===== 树 hero（上半屏） ===== */
+  #tree-hero {
+    position: relative; height: 42vh; height: 42dvh;
+    overflow: hidden;
+    background: linear-gradient(180deg, #1a0f38 0%, #251248 55%, #160d2e 100%);
+  }
+  #tree-hero::before {
+    content: ''; position: absolute; left: 50%; bottom: -14%;
+    width: 140%; height: 50%; transform: translateX(-50%);
+    background: radial-gradient(ellipse at center, rgba(180,140,255,.18), transparent 65%);
+  }
+  /* 微光星星 */
+  #tree-hero::after {
+    content: ''; position: absolute; top: 7%; right: 12%;
+    width: 9px; height: 9px; border-radius: 50%;
+    background: rgba(255,240,200,.9);
+    box-shadow: 55px 20px 0 -2px rgba(255,240,200,.7),
+                -75px 44px 0 -3px rgba(255,240,200,.55),
+                28px 64px 0 -4px rgba(255,240,200,.5),
+                105px 72px 0 -3px rgba(255,240,200,.4),
+                -28px 98px 0 -4px rgba(255,240,200,.35);
+    animation: twinkle 4s ease-in-out infinite;
+  }
+  @keyframes twinkle { 0%,100% { opacity: .9; } 50% { opacity: .4; } }
+  #canvas { position: absolute; }
+
+  /* ===== 文字区（下半屏，卡片式，绝不重叠） ===== */
+  #message {
+    position: relative; height: 58vh; height: 58dvh;
+    overflow-y: auto; -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    padding: 20px 22px 46px;
+    background: linear-gradient(180deg, #160d2e 0%, #1c0f36 100%);
+  }
+  #message::-webkit-scrollbar { width: 0; }
+  #code { max-width: 520px; margin: 0 auto; }
+  .msg {
+    display: none;
+    margin-bottom: 20px; padding: 14px 18px;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,180,220,.13);
+    border-radius: 16px;
+    font-size: 17px; line-height: 1.75; letter-spacing: 1px;
+    color: rgba(255,235,245,.96);
+    text-shadow: 0 0 12px rgba(255,150,200,.18);
+    box-shadow: 0 4px 18px rgba(0,0,0,.25);
+    animation: cardIn .55s ease both;
+  }
+  @keyframes cardIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+  .msg.show { display: block; }
+  .msg .cursor {
+    display: inline-block; width: 2px; height: 1.05em;
+    margin-left: 2px; vertical-align: -2px;
+    background: #ff9ec8; animation: blink .8s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  .msg .heart { color: #ff5fa2; margin-left: 6px; opacity: 0; transition: opacity .5s; }
+  .msg.done .heart { opacity: 1; }
+  .msg-title {
+    font-size: 24px; font-weight: 700;
+    background: linear-gradient(135deg, rgba(255,150,200,.22), rgba(255,90,160,.12));
+    border-color: rgba(255,150,200,.35);
+  }
+  .msg-highlight {
+    font-size: 19px; font-weight: 600; color: #ffd9e8;
+    border-color: rgba(255,120,180,.4);
+    background: linear-gradient(135deg, rgba(255,120,180,.25), rgba(120,80,255,.15));
+  }
+  #sign {
+    max-width: 520px; margin: 12px auto 0; text-align: center;
+    font-size: 15px; letter-spacing: 3px; color: rgba(255,180,220,.85);
+    opacity: 0; transition: opacity 1.2s ease; padding-bottom: 8px;
+  }
+
+  /* ===== 结尾爱心雨 ===== */
+  .rain-heart {
+    position: fixed; top: -40px; z-index: 600;
+    pointer-events: none; opacity: .85;
+    animation: fall linear forwards;
+  }
+  @keyframes fall { to { transform: translateY(115vh) rotate(360deg); opacity: 0; } }
+</style>
 </head>
-    <body>
-      <audio autoplay="autopaly">
-          <source src="music/kenan.mp3" type="audio/mp3" />
-      </audio>  
-        <div id="main">
-             <div id="wrap">
-                <div id="text">
-              <div id="code">
-            <font color="#FF0000">    
-<span class="say"><h1>小🌰，</h1></span><br>
-<span class="say">“当阳光照在地面上，”</span><br>
-<span class="say">“我思念你”</span><br>
-<span class="say">“当朦胧月色洒在泉水里”</span><br>
-<span class="say">“我思念你”</span><br><br>
-<br>
-<br>
-<span class="say">借我十年，借我 你如春天灿烂的笑颜</span><br><br>
-<span class="say">我想，</span><br><br>
-<span class="say">和你一起吃很久很久的饭</span><br><br>
-<span class="say">拍了拍“小🌰”一起遛弯，吹夏日晚风，看山河绮丽</span><br><br>
-<span class="say">一屋两人三餐四季，都是你</span><br><br>
-<span class="say"><span class="space"></span><h3>------- lcl -------</h3> </span><br>
+<body>
 
-        </font>
-      </div>
-                </div>
-                <div id="clock-box">
-              </div>
-                <canvas id="canvas" width="1100" height="680"></canvas>
-            </div>
-            
-        </div>
-    
-    <script>
-    </script>
+  <div id="start-overlay">
+    <div class="qixi">七月初七</div>
+    <div class="hint">今夜星河烂漫 · 轻触开启</div>
+    <div class="names">lcl ❤ 小🌰（秋儿）</div>
+    <div id="start-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,180,220,.95)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+    </div>
+    <div class="tip">建议戴上耳机聆听 · 七夕快乐</div>
+  </div>
 
-    <script>
-    (function(){
-        var canvas = $('#canvas');
-    
-        if (!canvas[0].getContext) {
-            $("#error").show();
-            return false;        }
+  <audio id="bgm" loop><source src="music/kenan.mp3" type="audio/mp3"></audio>
 
-        var width = canvas.width();
-        var height = canvas.height();        
-        canvas.attr("width", width);
-        canvas.attr("height", height);
-        var opts = {
-            seed: {
-                x: width / 2 - 20,
-                color: "rgb(190, 26, 37)",
-                scale: 2
-            },
-            branch: [
-                [535, 680, 570, 250, 500, 200, 30, 100, [
-                    [540, 500, 455, 417, 340, 400, 13, 100, [
-                        [450, 435, 434, 430, 394, 395, 2, 40]
-                    ]],
-                    [550, 445, 600, 356, 680, 345, 12, 100, [
-                        [578, 400, 648, 409, 661, 426, 3, 80]
-                    ]],
-                    [539, 281, 537, 248, 534, 217, 3, 40],
-                    [546, 397, 413, 247, 328, 244, 9, 80, [
-                        [427, 286, 383, 253, 371, 205, 2, 40],
-                        [498, 345, 435, 315, 395, 330, 4, 60]
-                    ]],
-                    [546, 357, 608, 252, 678, 221, 6, 100, [
-                        [590, 293, 646, 277, 648, 271, 2, 80]
-                    ]]
-                ]] 
-            ],
-            bloom: {
-                num: 700,
-                width: 1080,
-                height: 650,
-            },
-            footer: {
-                width: 1200,
-                height: 5,
-                speed: 10,
-            }
+  <div id="tree-hero"><canvas id="canvas" width="1100" height="680"></canvas></div>
+
+  <div id="message">
+    <div id="code">
+      <div class="msg msg-title" data-text="小🌰（秋儿），"><span class="msg-text"></span><span class="heart">💗</span></div>
+      <div class="msg" data-text="今夜喜鹊搭桥，星河铺路。"><span class="msg-text"></span><span class="heart">💗</span></div>
+      <div class="msg" data-text="传说牛郎织女，一年才盼来一次相见。"><span class="msg-text"></span><span class="heart">💗</span></div>
+      <div class="msg" data-text="而我贪心一点，想每天都见到你。"><span class="msg-text"></span><span class="heart">💗</span></div>
+      <div class="msg" data-text="起风的时候，想你的名字落进晚风里"><span class="msg-text"></span><span class="heart">💗</span></div>
+      <div class="msg" data-text="落雨的时候，想你的笑漾进雨声里"><span class="msg-text"></span><span class="heart">💗</span></div>
+      <div class="msg" data-text="你笑起来时，满天星光都悄悄失了色"><span class="msg-text"></span><span class="heart">💗</span></div>
+      <div class="msg" data-text="想和你走遍四季，把平凡的日子过成诗"><span class="msg-text"></span><span class="heart">💗</span></div>
+      <div class="msg" data-text="傍晚遛弯，晚霞落在你肩上，比银河还好看"><span class="msg-text"></span><span class="heart">💗</span></div>
+      <div class="msg" data-text="一屋两人三餐四季，岁岁年年，都是你"><span class="msg-text"></span><span class="heart">💗</span></div>
+      <div class="msg msg-highlight" data-text="七夕快乐，不止今天，是往后的每一天"><span class="msg-text"></span><span class="heart">💗</span></div>
+    </div>
+    <div id="sign">——— lcl ———</div>
+  </div>
+
+  <script>
+  (function(){
+    var canvas = $('#canvas');
+    if (!canvas[0].getContext) return;
+
+    // 树动画内部逻辑尺寸固定 1100x680（分支坐标全按此设计），CSS 缩放适配任意屏幕
+    var width = 1100, height = 680;
+    canvas.attr("width", width);
+    canvas.attr("height", height);
+
+    function fitTree() {
+      var hero = document.getElementById('tree-hero');
+      var c = canvas[0];
+      var s = Math.min(hero.clientWidth / width, hero.clientHeight / height);
+      c.style.width = Math.floor(width * s) + 'px';
+      c.style.height = Math.floor(height * s) + 'px';
+      c.style.left = '50%';
+      c.style.top = '50%';
+      c.style.transform = 'translate(-50%,-50%)';
+    }
+    fitTree();
+    window.addEventListener('resize', fitTree);
+
+    var opts = {
+      seed: { x: width / 2 - 20, color: "rgb(190, 26, 37)", scale: 2 },
+      branch: [
+        [535, 680, 570, 250, 500, 200, 30, 100, [
+          [540, 500, 455, 417, 340, 400, 13, 100, [
+            [450, 435, 434, 430, 394, 395, 2, 40]
+          ]],
+          [550, 445, 600, 356, 680, 345, 12, 100, [
+            [578, 400, 648, 409, 661, 426, 3, 80]
+          ]],
+          [539, 281, 537, 248, 534, 217, 3, 40],
+          [546, 397, 413, 247, 328, 244, 9, 80, [
+            [427, 286, 383, 253, 371, 205, 2, 40],
+            [498, 345, 435, 315, 395, 330, 4, 60]
+          ]],
+          [546, 357, 608, 252, 678, 221, 6, 100, [
+            [590, 293, 646, 277, 648, 271, 2, 80]
+          ]]
+        ]]
+      ],
+      bloom: { num: 700, width: 1080, height: 650 },
+      footer: { width: 1200, height: 5, speed: 10 }
+    };
+
+    var tree = new Tree(canvas[0], width, height, opts);
+    var seed = tree.seed;
+    var foot = tree.footer;
+    var hold = 1;
+
+    var seedAnimate = eval(Jscex.compile("async", function () {
+      seed.draw();
+      while (hold) { $await(Jscex.Async.sleep(10)); }
+      while (seed.canScale()) { seed.scale(0.95); $await(Jscex.Async.sleep(10)); }
+      while (seed.canMove()) { seed.move(0, 2); foot.draw(); $await(Jscex.Async.sleep(10)); }
+    }));
+
+    var growAnimate = eval(Jscex.compile("async", function () {
+      do { tree.grow(); $await(Jscex.Async.sleep(10)); } while (tree.canGrow());
+    }));
+
+    var flowAnimate = eval(Jscex.compile("async", function () {
+      do { tree.flower(2); $await(Jscex.Async.sleep(10)); } while (tree.canFlower());
+    }));
+
+    var moveAnimate = eval(Jscex.compile("async", function () {
+      tree.snapshot("p1", 240, 0, 610, 680);
+      while (tree.move("p1", 500, 0)) { foot.draw(); $await(Jscex.Async.sleep(10)); }
+      foot.draw();
+      tree.snapshot("p2", 500, 0, 610, 680);
+      // 定格成背景（深色版，避免原版白屏闪烁）
+      canvas.parent().css("background", "url(" + tree.toDataURL('image/png') + ")");
+      canvas.css("background", "#160d2e");
+      $await(Jscex.Async.sleep(300));
+      canvas.css("background", "none");
+    }));
+
+    var jumpAnimate = eval(Jscex.compile("async", function () {
+      var ctx = tree.ctx;
+      while (true) {
+        tree.ctx.clearRect(0, 0, width, height);
+        tree.jump();
+        foot.draw();
+        $await(Jscex.Async.sleep(25));
+      }
+    }));
+
+    /* ---- 自定义逐条打字机（卡片式，逐字显示） ---- */
+    var messages = Array.prototype.slice.call(document.querySelectorAll('#code .msg'));
+
+    function typeLine(el, text, done) {
+      var out = el.querySelector('.msg-text');
+      var cursor = document.createElement('span');
+      cursor.className = 'cursor';
+      out.appendChild(cursor);
+      var chars = Array.from(text); // 按码点分割，避免 emoji 拆成半个
+      var i = 0;
+      function step() {
+        if (i < chars.length) {
+          var ch = chars[i++];
+          out.insertBefore(document.createTextNode(ch), cursor);
+          var pause = /[，。、！？]/.test(ch) ? 280 : 68;
+          setTimeout(step, pause);
+        } else {
+          cursor.remove();
+          el.classList.add('done');
+          done();
         }
+      }
+      setTimeout(step, 60);
+    }
 
-        var tree = new Tree(canvas[0], width, height, opts);
-        var seed = tree.seed;
-        var foot = tree.footer;
-        var hold = 1;
+    function onAllDone() {
+      document.getElementById('sign').style.opacity = 1;
+      heartRain();
+    }
 
-        canvas.click(function(e) {
-            var offset = canvas.offset(), x, y;
-            x = e.pageX - offset.left;
-            y = e.pageY - offset.top;
-            if (seed.hover(x, y)) {
-                hold = 0; 
-                canvas.unbind("click");
-                canvas.unbind("mousemove");
-                canvas.removeClass('hand');
-            }
-        }).mousemove(function(e){
-            var offset = canvas.offset(), x, y;
-            x = e.pageX - offset.left;
-            y = e.pageY - offset.top;
-            canvas.toggleClass('hand', seed.hover(x, y));
-        });
+    function heartRain() {
+      var emojis = ['💗', '💖', '💘', '💕', '🌹', '✨'];
+      for (var i = 0; i < 26; i++) {
+        (function (n) {
+          setTimeout(function () {
+            var h = document.createElement('div');
+            h.className = 'rain-heart';
+            h.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+            h.style.left = Math.random() * 100 + 'vw';
+            h.style.fontSize = (14 + Math.random() * 16) + 'px';
+            h.style.animationDuration = (3.2 + Math.random() * 3) + 's';
+            h.style.animationDelay = (Math.random() * .6) + 's';
+            document.body.appendChild(h);
+            setTimeout(function () { h.remove(); }, 9000);
+          }, n * 300);
+        })(i);
+      }
+    }
 
-        var seedAnimate = eval(Jscex.compile("async", function () {
-            seed.draw();
-            while (hold) {
-                $await(Jscex.Async.sleep(10));
-            }
-            while (seed.canScale()) {
-                seed.scale(0.95);
-                $await(Jscex.Async.sleep(10));
-            }
-            while (seed.canMove()) {
-                seed.move(0, 2);
-                foot.draw();
-                $await(Jscex.Async.sleep(10));
-            }
-        }));
+    function playMessages() {
+      var idx = 0;
+      function next() {
+        if (idx >= messages.length) { onAllDone(); return; }
+        var el = messages[idx++];
+        el.classList.add('show');
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(function () {
+          typeLine(el, el.getAttribute('data-text'), function () {
+            setTimeout(next, 550);
+          });
+        }, 400);
+      }
+      next();
+    }
 
-        var growAnimate = eval(Jscex.compile("async", function () {
-            do {
-              tree.grow();
-                $await(Jscex.Async.sleep(10));
-            } while (tree.canGrow());
-        }));
+    var runAsync = eval(Jscex.compile("async", function () {
+      $await(seedAnimate());
+      $await(growAnimate());
+      $await(flowAnimate());
+      $await(moveAnimate());
+      playMessages();
+      $await(jumpAnimate());
+    }));
 
-        var flowAnimate = eval(Jscex.compile("async", function () {
-            do {
-              tree.flower(2);
-                $await(Jscex.Async.sleep(10));
-            } while (tree.canFlower());
-        }));
-
-        var moveAnimate = eval(Jscex.compile("async", function () {
-            tree.snapshot("p1", 240, 0, 610, 680);
-            while (tree.move("p1", 500, 0)) {
-                foot.draw();
-                $await(Jscex.Async.sleep(10));
-            }
-            foot.draw();
-            tree.snapshot("p2", 500, 0, 610, 680);
-
-            // 会有闪烁不得意这样做, (＞﹏＜)
-            canvas.parent().css("background", "url(" + tree.toDataURL('image/png') + ")");
-            canvas.css("background", "#ffe");
-            $await(Jscex.Async.sleep(300));
-            canvas.css("background", "none");
-        }));
-
-        var jumpAnimate = eval(Jscex.compile("async", function () {
-            var ctx = tree.ctx;
-            while (true) {
-                tree.ctx.clearRect(0, 0, width, height);
-                tree.jump();
-                foot.draw();
-                $await(Jscex.Async.sleep(25));
-            }
-        }));
-
-        var textAnimate = eval(Jscex.compile("async", function () {
-        var together = new Date();
-        //together.setFullYear(2009,10,23 );      //时间年月日
-        //together.setHours(16);            //小时  
-        //together.setMinutes(53);          //分钟
-        //together.setSeconds(0);         //秒前一位
-        //together.setMilliseconds(2);        //秒第二位
-
-        $("#code").show().typewriter();
-            $("#clock-box").fadeIn(500);
-            while (true) {
-                timeElapse(together);
-                $await(Jscex.Async.sleep(1000));
-            }
-        }));
-
-        var runAsync = eval(Jscex.compile("async", function () {
-            $await(seedAnimate());
-            $await(growAnimate());
-            $await(flowAnimate());
-            $await(moveAnimate());
-
-            textAnimate().start();
-
-            $await(jumpAnimate());
-        }));
-
-        runAsync().start();
-    })();
-    </script>
-
-    </body></html>
+    // 开始：播放音乐 + hold=0 跳过"点击种子"，直接长树
+    document.getElementById('start-btn').addEventListener('click', function () {
+      var audio = document.getElementById('bgm');
+      if (audio) audio.play().catch(function () {});
+      var overlay = document.getElementById('start-overlay');
+      overlay.style.opacity = '0';
+      setTimeout(function () { overlay.style.display = 'none'; }, 900);
+      hold = 0;
+      runAsync().start();
+    });
+  })();
+  </script>
+</body>
+</html>
